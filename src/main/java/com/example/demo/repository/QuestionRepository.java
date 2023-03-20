@@ -1,4 +1,4 @@
-package com.example.demo.question;
+package com.example.demo.repository;
 
 import java.util.List;
 
@@ -7,11 +7,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface QuestionRepository extends JpaRepository<Question, Integer> { // JpaRepository<엔티티 타입, 엔티티의 pk속성 타입>
+import com.example.demo.domain.Question;
+
+// * JpaRepository<엔티티 타입, 엔티티의 pk속성 타입> -> 이 repository로 db에서 조회할 데이터는 Question이라는 것을 명시(JpaRepository를 생성하기 위한 규칙)
+public interface QuestionRepository extends JpaRepository<Question, Integer> {
 
     Question findBySubject(String subject);
     // * 인터페이스에 선언된 함수는 원래, 이를 implements하는 클래스에서 필수적으로 기능을 구현해야한다.
-    // ? 아마 이 구현과정을 스프링이 대신해주겠지
+    // ! 스프링의 프록시 패턴에 의해 QuestionRepository 인터페이스의 실구현체가 만들어지고, 그 안에서 위의 함수도 같이 구현된다.
 
     Question findBySubjectAndContent(String subject, String content); // * 여러개의 속성을 동시에 조건으로 적용하고 싶을 땐, And 를 사용한다.
 
@@ -21,7 +24,7 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> { /
     // *  Or	            findBySubjectOrContent(String subject, String content)	                여러 컬럼을 or 로 검색
     // *  Between	        findByCreateDateBetween(LocalDateTime fromDate, LocalDateTime toDate)	컬럼을 between으로 검색
     // *  LessThan	        findByIdLessThan(Integer id)	                                        작은 항목 검색
-    // *  GreaterThanEqual	findByIdGraterThanEqual(Integer id)	                                    크거나 같은 항목 검색
+    // *  GreaterThanEqual	findByIdGreaterThanEqual(Integer id)	                                    크거나 같은 항목 검색
     // *  Like	            findBySubjectLike(String subject)	                                    like 검색
     // *  In	            findBySubjectIn(String[] subjects)	                                    여러 값중에 하나인 항목 검색
     // *  OrderBy	        findBySubjectOrderByCreateDateAsc(String subject)	                    검색 결과를 정렬하여 전달

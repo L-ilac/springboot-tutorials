@@ -1,16 +1,22 @@
-package com.example.demo.user;
+package com.example.demo.controller;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import lombok.RequiredArgsConstructor;
+import com.example.demo.form.UserCreateForm;
+import com.example.demo.service.UserService;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("/user")
@@ -19,12 +25,12 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/signup")
-    public String signup(UserCreateForm userCreateForm) {
+    public String signup(@ModelAttribute UserCreateForm userCreateForm) {
         return "signup_form";
     }
 
     @PostMapping("/signup")
-    public String signup(@Valid UserCreateForm userCreateForm, BindingResult bindingResult) {
+    public String signup(@Valid @ModelAttribute UserCreateForm userCreateForm, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "signup_form";
         }
@@ -39,12 +45,11 @@ public class UserController {
             userService.create(userCreateForm.getUsername(), userCreateForm.getEmail(), userCreateForm.getPassword());
 
         } catch (DataIntegrityViolationException e) {
-            // TODO: handle exception
-            e.printStackTrace();
-            bindingResult.reject("signupFailed", "이미 등록된 사용자입니다.");
+            log.info("error", e);
+            bindingResult.reject("duplicateUsername", "이미 등록된 사용자입니다.");
             return "signup_form";
         } catch (Exception e) {
-            e.printStackTrace();
+            log.info("error", e);
             bindingResult.reject("signupFailed", e.getMessage());
             return "signup_form";
         }
@@ -52,6 +57,7 @@ public class UserController {
         return "redirect:/";
     }
 
+    // todo 시큐리티의 로그인이 실패할 경우에는 로그인 페이지로 다시 리다이렉트 된다. 이 때 페이지 파라미터로 error가 함께 전달된다.(파라미터 확인)
     @GetMapping("/login")
     public String login() {
         return "login_form";

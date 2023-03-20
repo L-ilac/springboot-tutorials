@@ -14,6 +14,7 @@
     <table class="table">
         <thead class="table-dark">
             <tr class="text-center">
+                <th>조회수</th>
                 <th>번호</th>
                 <th style="width:50%">제목</th>
                 <th>글쓴이</th>
@@ -23,6 +24,7 @@
         <tbody>
             <!-- {% comment %} ! th:each="question : ${questionList}"  {% endcomment %} -->
             <tr class="text-center" th:each="question,loop : ${paging}">
+                <td th:text= "${question.viewCount}"></td>
                 <td th:text="${paging.getTotalElements - (paging.number * paging.size) - loop.index}"></td>
                 <td class="text-start">
                     <a th:href="@{|/question/detail/${question.id}|}" th:text="${question.subject}"></a> <!-- 일반 문자열과 자바 객체의 값을 더해서 쓸때는 |내용| 형식으로 써야함 -->

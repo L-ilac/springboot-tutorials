@@ -7,9 +7,9 @@ public enum UserRole {
     ADMIN("ROLE_ADMIN"),
     USER("ROLE_USER");
 
-    UserRole(String value) {
-        this.value = value;
+    UserRole(String description) {
+        this.description = description;
     }
 
-    private String value;
+    private String description;
 }

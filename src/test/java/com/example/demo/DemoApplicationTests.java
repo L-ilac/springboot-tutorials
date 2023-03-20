@@ -13,11 +13,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.demo.answer.Answer;
-import com.example.demo.answer.AnswerRepository;
-import com.example.demo.question.Question;
-import com.example.demo.question.QuestionRepository;
-import com.example.demo.question.QuestionService;
+import com.example.demo.domain.Answer;
+import com.example.demo.domain.Question;
+import com.example.demo.repository.AnswerRepository;
+import com.example.demo.repository.QuestionRepository;
+import com.example.demo.service.QuestionService;
 
 @SpringBootTest
 class DemoApplicationTests {
@@ -31,6 +31,8 @@ class DemoApplicationTests {
 
 	@Autowired
 	private AnswerRepository answerRepository;
+
+	// ! answerRepository와 questionRepository는 현재 인터페이스만 구현되어있다. 그럼에도 불구하고, 의존주입이 되어 코드가 돌아간다. -> 스프링이 JpaRepository 상속여부를 보고, 실구현체를 만들어 스프링 빈으로 등록했을 가능성이 높음(불확실)
 
 	/* 왜냐하면 Question 리포지터리가 findById를 호출하여 Question 객체를 조회하고 나면 DB세션이 끊어지기 때문이다. 그 이후에 실행되는 q.getAnswerList() 메서드는 세션이 종료되어 오류가 발생한다. 
 	답변 데이터 리스트는 q 객체를 조회할때 가져오지 않고 q.getAnswerList() 메서드를 호출하는 시점에 가져오기 때문이다. 이렇게 필요한 시점에 데이터를 가져오는 방식을 Lazy 방식이라고 한다. 
@@ -53,6 +55,7 @@ class DemoApplicationTests {
 	@Transactional // * 위의 설명을 꼭 다시 읽어볼 것. 장고에서도 lazyobject와 같은 개념들이 있었는데 유사한 개념인거 같다. 
 	@Test
 	void testJpa() {
+
 		Optional<Question> oq4 = this.questionRepository.findById(2);
 		assertTrue(oq4.isPresent());
 		Question q7 = oq4.get();
@@ -74,10 +77,12 @@ class DemoApplicationTests {
 		assertTrue(tmpoq.isPresent());
 		Question q6 = tmpoq.get();
 
-		Answer a = new Answer();
-		a.setContent("WADADA");
-		a.setQuestion(q6);
-		a.setCreateDate(LocalDateTime.now());
+		Answer a = Answer.builder()
+				.content("WADADA")
+				.question(q6)
+				.createDate(LocalDateTime.now())
+				.build();
+
 		this.answerRepository.save(a);
 
 		// ===========================================================================================================================================================
@@ -95,7 +100,7 @@ class DemoApplicationTests {
 		Optional<Question> oq1 = this.questionRepository.findById(1);
 		assertTrue(oq1.isPresent()); // * 주어진 값이 참인지 테스트
 		Question q4 = oq1.get();
-		q4.setSubject("좋아하는 여자가수는?");
+		// q4.setSubject("좋아하는 여자가수는?");
 		this.questionRepository.save(q4); // *데이터 수정 후 저장해야 실제 데이터베이스에 반영됌
 
 		// ===========================================================================================================================================================

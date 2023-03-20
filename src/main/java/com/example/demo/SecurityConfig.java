@@ -21,22 +21,26 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        // * 모든 인증되지 않은 요청을 허락한다는 의미를 지닌 코드
-        http.authorizeRequests().requestMatchers(new AntPathRequestMatcher("/**")).permitAll()
+        // todo spring security에서 어떤 코드가 어떤 보안 공격을 막고 있는지 분석해볼 것.
+        http.authorizeHttpRequests().requestMatchers(new AntPathRequestMatcher("/**")).permitAll()
                 .and()
                 .csrf().ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**"))
+
                 .and()
                 .headers()
                 .addHeaderWriter(new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))
+
                 .and()
                 .formLogin()
                 .loginPage("/user/login")
                 .defaultSuccessUrl("/")
+
                 .and()
                 .logout()
                 .logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
                 .logoutSuccessUrl("/")
-                .invalidateHttpSession(true);
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID");
 
         return http.build();
     }

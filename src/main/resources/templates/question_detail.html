@@ -31,6 +31,12 @@
 
     <h5 class="border-bottom my-3 py-2" th:text ="|${#lists.size(question.answerList)}개의 답변이 있습니다.|"></h5>
 
+    <select id = "selectbox" name ="selectbox">
+        <option>정렬 기준 선택</option>
+        <option>추천순</option>
+        <option>최신순</option>
+    </select>
+
     <div class="card my-3" th:each="answer: ${question.answerList}">
         <a th:id="|answer_${answer.id}|"></a>
         <div class="card-body">
