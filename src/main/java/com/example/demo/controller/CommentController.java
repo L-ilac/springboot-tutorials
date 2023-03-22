@@ -19,12 +19,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.demo.domain.Answer;
-import com.example.demo.domain.Question;
+import com.example.demo.domain.Comment;
+import com.example.demo.domain.Post;
 import com.example.demo.domain.SiteUser;
-import com.example.demo.form.AnswerForm;
-import com.example.demo.service.AnswerService;
-import com.example.demo.service.QuestionService;
+import com.example.demo.form.CommentDto;
+import com.example.demo.service.CommentService;
+import com.example.demo.service.PostService;
 import com.example.demo.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -32,19 +32,19 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/answer")
 @RequiredArgsConstructor
 @Controller
-public class AnswerController {
-    private final QuestionService questionService;
-    private final AnswerService answerService;
+public class CommentController {
+    private final PostService questionService;
+    private final CommentService answerService;
     private final UserService userService;
 
     @PreAuthorize("isAuthenticated()") // ! 이 애너테이션을 사용하면, 이 url로 요청이 들어오면 자동으로 로그인 화면으로 이동하고, 로그인 후에는 원래 화면으로 리다이렉트된다. 
     @PostMapping("/create/{id}")
     public String createAnswer(Model model, @PathVariable Integer id,
-            @Valid @ModelAttribute AnswerForm answerForm,
+            @Valid @ModelAttribute CommentDto answerForm,
             BindingResult bindingResult,
             RedirectAttributes redirectAttributes, Principal principal) {
 
-        Question question = this.questionService.getQuestion(id); // * 서비스 계층에서 질문이 없을 경우 예외를 던짐
+        Post question = this.questionService.getQuestion(id); // * 서비스 계층에서 질문이 없을 경우 예외를 던짐
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("question", question);
@@ -53,7 +53,7 @@ public class AnswerController {
         }
 
         SiteUser siteUser = this.userService.getUser(principal.getName());
-        Answer createdAnswer = this.answerService.create(question, answerForm.getContent(), siteUser);
+        Comment createdAnswer = this.answerService.create(question, answerForm.getContent(), siteUser);
 
         // ? this.answerService.create(question, answerForm, siteUser);
 
@@ -67,9 +67,9 @@ public class AnswerController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/modify/{id}")
-    public String modifyAnswer(@ModelAttribute AnswerForm answerForm, Principal principal,
+    public String modifyAnswer(@ModelAttribute CommentDto answerForm, Principal principal,
             @PathVariable Integer id) {
-        Answer answer = this.answerService.getAnswer(id);
+        Comment answer = this.answerService.getAnswer(id);
 
         if (!answer.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
@@ -82,7 +82,7 @@ public class AnswerController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/modify/{id}")
-    public String modifyAnswer(@Valid @ModelAttribute AnswerForm answerForm, BindingResult bindingResult,
+    public String modifyAnswer(@Valid @ModelAttribute CommentDto answerForm, BindingResult bindingResult,
             RedirectAttributes redirectAttribute,
             Principal principal,
             @PathVariable Integer id) {
@@ -91,7 +91,7 @@ public class AnswerController {
             return "answer_form";
         }
 
-        Answer answer = this.answerService.getAnswer(id);
+        Comment answer = this.answerService.getAnswer(id);
 
         if (!answer.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
@@ -107,7 +107,7 @@ public class AnswerController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/delete/{id}")
     public String delete(RedirectAttributes redirectAttributes, Principal principal, @PathVariable Integer id) {
-        Answer answer = this.answerService.getAnswer(id);
+        Comment answer = this.answerService.getAnswer(id);
 
         if (!answer.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
@@ -125,7 +125,7 @@ public class AnswerController {
     public String vote(RedirectAttributes redirectAttributes, Principal principal, @PathVariable Integer id) {
 
         SiteUser siteUser = this.userService.getUser(principal.getName());
-        Answer answer = this.answerService.vote(id, siteUser);
+        Comment answer = this.answerService.vote(id, siteUser);
 
         redirectAttributes.addAttribute("question_id", answer.getQuestion().getId());
         return "redirect:/question/detail/%{question_id}#answer_%{id}";

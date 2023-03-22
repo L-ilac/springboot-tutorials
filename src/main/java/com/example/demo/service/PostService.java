@@ -23,44 +23,44 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.DataNotFoundException;
-import com.example.demo.domain.Answer;
-import com.example.demo.domain.Question;
+import com.example.demo.domain.Comment;
+import com.example.demo.domain.Post;
 import com.example.demo.domain.SiteUser;
-import com.example.demo.form.QuestionForm;
-import com.example.demo.repository.QuestionRepository;
+import com.example.demo.form.PostDto;
+import com.example.demo.repository.PostRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
-public class QuestionService {
-    private final QuestionRepository questionRepository;
+public class PostService {
+    private final PostRepository questionRepository;
 
     // * 모든 질문을 전부 가져오는 getList
-    public List<Question> getList() {
+    public List<Post> getList() {
         return this.questionRepository.findAll();
     }
 
     // * 정수 타입의 페이지번호를 입력받아 해당 페이지의 질문 목록을 가져오는 getList
-    public Page<Question> getList(int pageNum, String keyword) {
+    public Page<Post> getList(int pageNum, String keyword) {
         List<Sort.Order> sortPolicy = new ArrayList<>(); // ! 정렬 기준을 담는 리스트
         sortPolicy.add(Sort.Order.desc("createDate")); // ! 정렬기준으로 (작성일시+역순) 을 넣고,
         Pageable pageable = PageRequest.of(pageNum, 10, Sort.by(sortPolicy)); // ! 정렬기준을 설정하여, PageRequest 생성
 
         // todo develop 다양한 정렬기준(조회수, 추천수, 사전순 등등) 적용해볼 것 
 
-        Specification<Question> spec = search(keyword);
+        Specification<Post> spec = search(keyword);
         return this.questionRepository.findAll(spec, pageable);
     }
 
-    public Question getQuestion(Integer id) {
+    public Post getQuestion(Integer id) {
 
         return this.questionRepository.findById(id).orElseThrow(() -> new DataNotFoundException("question not found"));
     }
 
     // todo builder 패턴을 이용해서 객체를 저장하는 것이 과연 성능적으로 좋은가?
-    public void create(QuestionForm questionForm, SiteUser siteUser) {
-        Question question = questionForm.dtoToEntity();
+    public void create(PostDto questionForm, SiteUser siteUser) {
+        Post question = questionForm.dtoToEntity();
         question.toBuilder()
                 .author(siteUser)
                 .createDate(LocalDateTime.now())
@@ -69,8 +69,8 @@ public class QuestionService {
         this.questionRepository.save(question);
     }
 
-    public Question create(String subject, String content, SiteUser author) {
-        Question question = Question.builder()
+    public Post create(String subject, String content, SiteUser author) {
+        Post question = Post.builder()
                 .content(content)
                 .subject(subject)
                 .author(author)
@@ -81,31 +81,31 @@ public class QuestionService {
         return this.questionRepository.save(question);
     }
 
-    public void modify(Question question, QuestionForm questionForm) {
+    public void modify(Post question, PostDto questionForm) {
         question.update(questionForm.getSubject(), questionForm.getContent());
         this.questionRepository.save(question);
     }
 
-    public void delete(Question question) {
+    public void delete(Post question) {
         this.questionRepository.delete(question);
     }
 
     public void vote(Integer question_id, SiteUser siteUser) {
-        Question question = getQuestion(question_id);
+        Post question = getQuestion(question_id);
         question.getVoter().add(siteUser);
         this.questionRepository.save(question);
     }
 
-    private Specification<Question> search(String keyword) {
+    private Specification<Post> search(String keyword) {
         return new Specification<>() {
             private static final long serialVersionID = 1L;
 
             @Override
-            public Predicate toPredicate(Root<Question> q, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+            public Predicate toPredicate(Root<Post> q, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
                 query.distinct(true);
-                Join<Question, SiteUser> u1 = q.join("author", JoinType.LEFT);
-                Join<Question, Answer> a = q.join("answerList", JoinType.LEFT);
-                Join<Answer, SiteUser> u2 = a.join("author", JoinType.LEFT);
+                Join<Post, SiteUser> u1 = q.join("author", JoinType.LEFT);
+                Join<Post, Comment> a = q.join("answerList", JoinType.LEFT);
+                Join<Comment, SiteUser> u2 = a.join("author", JoinType.LEFT);
                 return criteriaBuilder.or(criteriaBuilder.like(q.get("subject"), "%" + keyword + "%"),
                         criteriaBuilder.like(q.get("content"), "%" + keyword + "%"),
                         criteriaBuilder.like(u1.get("username"), "%" + keyword + "%"),
@@ -116,7 +116,7 @@ public class QuestionService {
     }
 
     public void addViewCount(Integer id) {
-        Question question = getQuestion(id);
+        Post question = getQuestion(id);
         question.addViewCount();
 
         this.questionRepository.save(question);

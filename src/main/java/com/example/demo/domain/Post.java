@@ -25,7 +25,7 @@ import lombok.Setter;
 @Builder(toBuilder = true)
 // @Setter
 @Entity // ! JPA 에서 데이터 접근을 객체로 하기 위해서 필요한 애너테이션이라고 생각하면 될듯
-public class Question {
+public class Post {
 
     @Id // * primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // * 자동으로 증가하는 값 -> auto increment
@@ -46,7 +46,7 @@ public class Question {
 
     // * 질문 1개 : 답변 여러개 의 형태인 onetomany 관계임을 나타냄. 답변이 여러개이므로 list 형태로 선언
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE) // ! mappedby 값은 Answer에서 Question을 참조하기 위해 선언한 Question 클래스 필드변수의 이름 question임.
-    private List<Answer> answerList; // * question.getAnswerList() 로 답변목록 접근
+    private List<Comment> answerList; // * question.getAnswerList() 로 답변목록 접근
 
     @ManyToOne
     private SiteUser author; // 여러개의 질문(many)이 한명의 사용자(one)에 의해 작성될 수 있음
@@ -54,7 +54,7 @@ public class Question {
     @ManyToMany //하나의 질문에 여러사람이 추천할 수 있고 한 사람이 여러 개의 질문을 추천할 수 있다. 대등한 관계이기 때문에 @ManyToMany를 사용
     Set<SiteUser> voter;
 
-    public Question update(String subject, String content) {
+    public Post update(String subject, String content) {
         this.subject = subject;
         this.content = content;
         this.modifyDate = LocalDateTime.now();

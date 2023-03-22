@@ -4,9 +4,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.demo.domain.Answer;
+import com.example.demo.domain.Comment;
 
-public interface AnswerRepository extends JpaRepository<Answer, Integer> {
+public interface CommentRepository extends JpaRepository<Comment, Integer> {
 
-    Page<Answer> findAll(Pageable pageable);
+    Page<Comment> findAll(Pageable pageable);
 }

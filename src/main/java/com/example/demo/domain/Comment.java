@@ -22,7 +22,7 @@ import lombok.Setter;
 // @Setter
 @Builder(toBuilder = true)
 @Entity
-public class Answer {
+public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +36,7 @@ public class Answer {
 
     // ! 특정 Entity와 연결된 속성이라는 것을 명시적으로 표시해야함
     @ManyToOne // * 데이터 베이스 간 관계에서 many to one의 관계 (답변 여러개 : 질문 1개) -> DB상에서는 foreign key 관계가 생성.
-    private Question question; // * answer.getQuestion().getSubject -> 특정 answer 객체의 질문의 subject를 접근하는 방법
+    private Post question; // * answer.getQuestion().getSubject -> 특정 answer 객체의 질문의 subject를 접근하는 방법
 
     @ManyToOne // 답변 여러개 : 사용자 1명
     private SiteUser author;
@@ -44,7 +44,7 @@ public class Answer {
     @ManyToMany
     Set<SiteUser> voter;
 
-    public Answer update(String content) {
+    public Comment update(String content) {
         this.content = content;
         this.modifyDate = LocalDateTime.now();
 

@@ -25,13 +25,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.demo.domain.Answer;
-import com.example.demo.domain.Question;
+import com.example.demo.domain.Comment;
+import com.example.demo.domain.Post;
 import com.example.demo.domain.SiteUser;
-import com.example.demo.form.AnswerForm;
-import com.example.demo.form.QuestionForm;
-import com.example.demo.service.AnswerService;
-import com.example.demo.service.QuestionService;
+import com.example.demo.form.CommentDto;
+import com.example.demo.form.PostDto;
+import com.example.demo.service.CommentService;
+import com.example.demo.service.PostService;
 import com.example.demo.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -41,9 +41,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/question")
 @RequiredArgsConstructor // *lombok이 제공하는 애너테이션으로 final이 붙은 클래스의 필드 속성을 포함하는 생성자를 자동으로 생성하는 역할
 @Controller
-public class QuestionController {
+public class PostController {
 
-    private final QuestionService questionService;
+    private final PostService questionService;
     private final UserService userService;
 
     @GetMapping("/list")
@@ -54,7 +54,7 @@ public class QuestionController {
 
         log.info("session = {}", session);
 
-        Page<Question> paging = this.questionService.getList(page, keyword);
+        Page<Post> paging = this.questionService.getList(page, keyword);
         // * paging에서 객체 꺼내는법 -> List<Question> contents = paging.getContent();
 
         // * Model 객체는 따로 생성할 필요없이 컨트롤러 메서드의 매개변수로 지정하기만 하면 스프링부트가 자동으로 Model 객체를 생성한다.
@@ -66,13 +66,13 @@ public class QuestionController {
     }
 
     @GetMapping("/detail/{id}")
-    public String detail(Model model, @PathVariable Integer id, @ModelAttribute AnswerForm answerForm,
+    public String detail(Model model, @PathVariable Integer id, @ModelAttribute CommentDto answerForm,
             @RequestParam(defaultValue = "0") int page) { // * @PathVariable 를 이용해서 각 데이터별로 변하는 값(ex. id)을 url로부터 전달받는다.
         // ! AnswerForm 이 필요한 이유 -> 템플릿에서 th:object를 사용하기 때문에, 빈 객체라도 던져줘야한다.
 
         // todo 중복조회 카운트 문제
         this.questionService.addViewCount(id);
-        Question question = this.questionService.getQuestion(id);
+        Post question = this.questionService.getQuestion(id);
 
         // Page<Answer> paging = this.answerService.getList(page);
 
@@ -84,14 +84,14 @@ public class QuestionController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/create")
-    public String create(@ModelAttribute QuestionForm questionForm) {
+    public String create(@ModelAttribute PostDto questionForm) {
         return "question_form";
     }
 
     // * 메서드 오버로딩을 통해 get과 post를 구분할 수 있음
     @PostMapping("/create")
     @PreAuthorize("isAuthenticated()")
-    public String create(@Valid @ModelAttribute QuestionForm questionForm, BindingResult bindingResult,
+    public String create(@Valid @ModelAttribute PostDto questionForm, BindingResult bindingResult,
             RedirectAttributes redirectAttributes,
             Principal principal) {
 
@@ -102,7 +102,7 @@ public class QuestionController {
 
         SiteUser siteUser = this.userService.getUser(principal.getName());
 
-        Question createdQuestion = this.questionService.create(questionForm.getSubject(), questionForm.getContent(),
+        Post createdQuestion = this.questionService.create(questionForm.getSubject(), questionForm.getContent(),
                 siteUser);
 
         // todo builder performance? -> this.questionService.create(questionForm, siteUser);
@@ -117,8 +117,8 @@ public class QuestionController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/modify/{id}")
-    public String modify(@ModelAttribute QuestionForm questionForm, @PathVariable Integer id, Principal principal) { // * @PathVariable 를 이용해서 각 데이터별로 변하는 값(ex. id)을 url로부터 전달받는다.
-        Question question = this.questionService.getQuestion(id);
+    public String modify(@ModelAttribute PostDto questionForm, @PathVariable Integer id, Principal principal) { // * @PathVariable 를 이용해서 각 데이터별로 변하는 값(ex. id)을 url로부터 전달받는다.
+        Post question = this.questionService.getQuestion(id);
 
         if (!question.getAuthor().getUsername().equals(principal.getName())) {
             // todo 예외로 던지는게 맞는걸까?
@@ -133,7 +133,7 @@ public class QuestionController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/modify/{id}")
-    public String modify(@Valid @ModelAttribute QuestionForm questionForm, BindingResult bindingResult,
+    public String modify(@Valid @ModelAttribute PostDto questionForm, BindingResult bindingResult,
             Principal principal,
             @PathVariable Integer id) {
 
@@ -141,7 +141,7 @@ public class QuestionController {
             return "question_form";
         }
 
-        Question question = this.questionService.getQuestion(id);
+        Post question = this.questionService.getQuestion(id);
 
         if (!question.getAuthor().getUsername().equals(principal.getName())) {
             // todo 예외로 던지는게 맞는걸까?
@@ -156,7 +156,7 @@ public class QuestionController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/delete/{id}")
     public String delete(Principal principal, @PathVariable Integer id) {
-        Question question = this.questionService.getQuestion(id);
+        Post question = this.questionService.getQuestion(id);
 
         if (!question.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제 권한이 없습니다.");

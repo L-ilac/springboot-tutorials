@@ -1,6 +1,6 @@
 package com.example.demo.form;
 
-import com.example.demo.domain.Question;
+import com.example.demo.domain.Post;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
@@ -10,7 +10,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class QuestionForm {
+public class PostDto {
     @NotEmpty(message = "제목은 필수 입력 항목입니다.")
     @Size(max = 200)
     private String subject;
@@ -18,8 +18,8 @@ public class QuestionForm {
     @NotEmpty(message = "내용은 필수 입력 항목입니다.")
     private String content;
 
-    public Question dtoToEntity() {
-        Question question = Question.builder()
+    public Post dtoToEntity() {
+        Post question = Post.builder()
                 .subject(this.getSubject())
                 .content(this.getContent())
                 .build();
