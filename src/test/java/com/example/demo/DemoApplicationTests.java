@@ -13,24 +13,24 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.demo.domain.Answer;
-import com.example.demo.domain.Question;
-import com.example.demo.repository.AnswerRepository;
-import com.example.demo.repository.QuestionRepository;
-import com.example.demo.service.QuestionService;
+import com.example.demo.domain.Comment;
+import com.example.demo.domain.Post;
+import com.example.demo.repository.CommentRepository;
+import com.example.demo.repository.PostRepository;
+import com.example.demo.service.PostService;
 
 @SpringBootTest
 class DemoApplicationTests {
 
 	// ! 객체를 스프링이 자동으로 생성하여 주입(DI- Dependency Injection)
 	@Autowired // * 테스트 코드에서는 생성자를 통한 객체 주입이 불가능하므로 autowired 사용
-	private QuestionRepository questionRepository;
+	private PostRepository questionRepository;
 
 	@Autowired
-	private QuestionService questionService;
+	private PostService questionService;
 
 	@Autowired
-	private AnswerRepository answerRepository;
+	private CommentRepository answerRepository;
 
 	// ! answerRepository와 questionRepository는 현재 인터페이스만 구현되어있다. 그럼에도 불구하고, 의존주입이 되어 코드가 돌아간다. -> 스프링이 JpaRepository 상속여부를 보고, 실구현체를 만들어 스프링 빈으로 등록했을 가능성이 높음(불확실)
 
@@ -56,28 +56,28 @@ class DemoApplicationTests {
 	@Test
 	void testJpa() {
 
-		Optional<Question> oq4 = this.questionRepository.findById(2);
+		Optional<Post> oq4 = this.questionRepository.findById(2);
 		assertTrue(oq4.isPresent());
-		Question q7 = oq4.get();
+		Post q7 = oq4.get();
 
-		List<Answer> aList = q7.getAnswerList();
+		List<Comment> aList = q7.getAnswerList();
 		assertEquals(1, aList.size());
 		assertEquals("WADADA", aList.get(0).getContent());
 
 		// ===========================================================================================================================================================
 		// 답변 조회 + 답변을 통해 어떤 질문이었는지 찾기
-		Optional<Answer> oa = this.answerRepository.findById(1);
+		Optional<Comment> oa = this.answerRepository.findById(1);
 		assertTrue(oa.isPresent());
-		Answer tmpa = oa.get();
+		Comment tmpa = oa.get();
 		assertEquals(2, tmpa.getQuestion().getId()); // ! 답변하나에 연결된 질문은 하나라서 그냥 엔티티 속성 접근하듯 접근하면 된다.
 
 		// ===========================================================================================================================================================
 		// 답변 등록
-		Optional<Question> tmpoq = this.questionRepository.findById(2);
+		Optional<Post> tmpoq = this.questionRepository.findById(2);
 		assertTrue(tmpoq.isPresent());
-		Question q6 = tmpoq.get();
+		Post q6 = tmpoq.get();
 
-		Answer a = Answer.builder()
+		Comment a = Comment.builder()
 				.content("WADADA")
 				.question(q6)
 				.createDate(LocalDateTime.now())
@@ -88,48 +88,48 @@ class DemoApplicationTests {
 		// ===========================================================================================================================================================
 		// 질문 삭제
 		assertEquals(2, this.questionRepository.count()); // * count함수는 해당 리포지터리의 총 데이터 갯수를 리턴한다. 
-		Optional<Question> oq2 = this.questionRepository.findById(1);
+		Optional<Post> oq2 = this.questionRepository.findById(1);
 		assertTrue(oq2.isPresent());
-		Question q5 = oq2.get();
+		Post q5 = oq2.get();
 		this.questionRepository.delete(q5); // * 실제 데이터 베이스에 있는 데이터를 삭제하는 과정
 		assertEquals(1, this.questionRepository.count());
 
 		// ===========================================================================================================================================================
 		// 질문 수정
 
-		Optional<Question> oq1 = this.questionRepository.findById(1);
+		Optional<Post> oq1 = this.questionRepository.findById(1);
 		assertTrue(oq1.isPresent()); // * 주어진 값이 참인지 테스트
-		Question q4 = oq1.get();
+		Post q4 = oq1.get();
 		// q4.setSubject("좋아하는 여자가수는?");
 		this.questionRepository.save(q4); // *데이터 수정 후 저장해야 실제 데이터베이스에 반영됌
 
 		// ===========================================================================================================================================================
 		// 질문 조회 by Subject Like (특정 문자열을 포함하는 데이터 조회)
 		// * %문자열, 문자열%, %문자열% -> 문자열로 시작, 문자열로 종료, 문자열을 포함
-		List<Question> qList = this.questionRepository.findBySubjectLike("%가수%"); // 가수를 포함하는 문자열로 검색한 경우
-		Question tmpq = qList.get(0);
+		List<Post> qList = this.questionRepository.findBySubjectLike("%가수%"); // 가수를 포함하는 문자열로 검색한 경우
+		Post tmpq = qList.get(0);
 		assertEquals("좋아하는 가수는?", tmpq.getSubject());
 
 		// ===========================================================================================================================================================
 		// 질문 조회 by Subject and Content (두 개의 속성을 동시에 조건으로 사용)
-		Question q1 = this.questionRepository.findBySubjectAndContent("좋아하는 가수는?", "가수의 이름을 알려주세요.");
+		Post q1 = this.questionRepository.findBySubjectAndContent("좋아하는 가수는?", "가수의 이름을 알려주세요.");
 		assertEquals(1, q1.getId());
 
 		// ===========================================================================================================================================================
 		// 질문 조회 by Subject
 		// ! QuestionRepository 인터페이스에 findBySubject 함수를 선언하면, JPA가 해당 메서드명을 분석하여 쿼리를 만들고 실행한다.
 		// * findBy + 엔티티의 속성명 으로 함수를 작성하면 됌.
-		Question q0 = this.questionRepository.findBySubject("좋아하는 가수는?");
+		Post q0 = this.questionRepository.findBySubject("좋아하는 가수는?");
 		assertEquals(1, q0.getId());
 
 		// ===========================================================================================================================================================
 		// 질문 조회 by ID
 		// id값으로 조회는 findById를 사용한다. 리턴 타입이 question이 아닌 optional 이다.
 		// * Optional은 null 처리를 유연하게 하기 위해서 사용하는 클래스이고, isPresent 를 이용해서 null 확인후 실제 question 객체값을 얻음.
-		Optional<Question> oq = this.questionRepository.findById(1);
+		Optional<Post> oq = this.questionRepository.findById(1);
 
 		if (oq.isPresent()) {
-			Question q = oq.get();
+			Post q = oq.get();
 			assertEquals("좋아하는 가수는?", q.getSubject());
 		}
 		// ===========================================================================================================================================================

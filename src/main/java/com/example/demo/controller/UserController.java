@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.example.demo.form.UserCreateForm;
+import com.example.demo.form.SignUpDto;
 import com.example.demo.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,12 +25,12 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/signup")
-    public String signup(@ModelAttribute UserCreateForm userCreateForm) {
+    public String signup(@ModelAttribute SignUpDto userCreateForm) {
         return "signup_form";
     }
 
     @PostMapping("/signup")
-    public String signup(@Valid @ModelAttribute UserCreateForm userCreateForm, BindingResult bindingResult) {
+    public String signup(@Valid @ModelAttribute SignUpDto userCreateForm, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "signup_form";
         }
