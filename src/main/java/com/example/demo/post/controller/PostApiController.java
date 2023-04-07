@@ -45,6 +45,7 @@ public class PostApiController {
         Long id = postService.newPost(createDto.getTitle(), createDto.getContent());
 
         Post post = postService.getOnlyPost(id);
+
         return new PostApiDto(post);
     }
 

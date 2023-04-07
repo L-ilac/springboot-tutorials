@@ -7,5 +7,5 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class PostQueryService {
-    // private final PostRepository postRepository;
+    // private final PostQueryRepository postQueryRepository;
 }

@@ -31,7 +31,6 @@ public class PostApiDto {
     // todo commnet -> commentApidto 변환 과정 필요
     private List<CommentApiDto> commentList;
 
-    // @Builder
     public PostApiDto(Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
