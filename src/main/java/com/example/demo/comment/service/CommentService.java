@@ -1,13 +1,9 @@
 package com.example.demo.comment.service;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.DataNotFoundException;
-import com.example.demo.comment.controller.CommentApiDto;
 import com.example.demo.comment.domain.Comment;
 import com.example.demo.comment.repository.CommentRepository;
 import com.example.demo.post.domain.Post;
@@ -47,9 +43,7 @@ public class CommentService {
     // * 삭제
     @Transactional
     public void deleteComment(Long id) {
-        Comment comment = getComment(id); // ! 동일 service의 다른 함수인데 트랜잭션이 어떻게 작동하는지 봐야함
-
-        commentRepository.delete(comment);
+        commentRepository.deleteById(id);
     }
 
 }

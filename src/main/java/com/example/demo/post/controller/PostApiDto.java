@@ -39,7 +39,6 @@ public class PostApiDto {
         this.lastmodifiedDate = post.getLastmodifiedDate();
         this.viewCount = post.getViewCount();
         this.like = post.getLikeCount();
-
         this.commentList = post.getCommentList().stream().map(c -> new CommentApiDto(c)).collect(Collectors.toList());
     }
 

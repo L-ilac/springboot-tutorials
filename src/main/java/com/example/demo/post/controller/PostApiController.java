@@ -19,7 +19,7 @@ import com.example.demo.post.service.PostService;
 
 import lombok.RequiredArgsConstructor;
 
-@RequestMapping("/board")
+@RequestMapping("/posts")
 @RestController
 @RequiredArgsConstructor
 public class PostApiController {
