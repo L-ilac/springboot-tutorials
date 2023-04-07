@@ -19,7 +19,7 @@ import com.example.demo.post.service.PostService;
 
 import lombok.RequiredArgsConstructor;
 
-@RequestMapping("/board")
+@RequestMapping("/posts")
 @RestController
 @RequiredArgsConstructor
 public class PostApiController {
@@ -45,6 +45,7 @@ public class PostApiController {
         Long id = postService.newPost(createDto.getTitle(), createDto.getContent());
 
         Post post = postService.getOnlyPost(id);
+
         return new PostApiDto(post);
     }
 
