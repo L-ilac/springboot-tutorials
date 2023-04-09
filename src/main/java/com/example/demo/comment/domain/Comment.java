@@ -55,7 +55,8 @@ public class Comment {
 
     }
 
-    public void setPost(Post post) {
+    public void setPost(Post post) { // belongTo 와 같은 함수명으로 변경하는 것을 고려.
+
         this.post = post;
     }
 
