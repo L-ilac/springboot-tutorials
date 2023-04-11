@@ -1,6 +1,5 @@
 package com.example.demo.comment.domain;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.example.demo.post.domain.Post;
