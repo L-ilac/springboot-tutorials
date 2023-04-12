@@ -1,5 +1,7 @@
 package com.example.demo.member.oauth2;
 
+import com.example.demo.member.domain.Member;
+import com.example.demo.member.repository.MemberRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NamedQuery;
 import jakarta.servlet.http.HttpSession;
@@ -59,12 +61,5 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 //                 attributes.getAttributes(), attributes.getNameAttributeKey());
 
 
-        }
-        private Member saveOrUpdate(OAuthAttributes attributes, String registrationId) {
-                Member member = memberRepository.findByEmail(attributes.getEmail())
-                                .map(e -> e.update())
-                                .orElse(attributes.toEntity(registrationId));
-
-                return memberRepository.save(member);
         }
 }
