@@ -17,7 +17,8 @@ public class PostQueryRepository {
 
     public Optional<Post> findById(Long postId) {
         return Optional
-                .ofNullable(em.createQuery("select p from Post p join fetch Comment", Post.class).getSingleResult());
+                .ofNullable(em.createQuery("select p from Post p join fetch p.commentList where p.id = :postId", Post.class)
+                        .setParameter("postId", postId).getSingleResult());
 
     }
 

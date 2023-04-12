@@ -44,7 +44,7 @@ public class Post {
     @Column(name = "view", nullable = false)
     private int viewCount;
 
-    @Column(name = "likeCount", nullable = false) // ! primitive int nullable test
+    @Column(name = "likeCount", nullable = false)
     private int likeCount; // todo 좋아요는 유저당 1번으로 제한하려면 유저 엔티티와 매핑해야함
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
