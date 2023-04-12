@@ -1,8 +1,8 @@
 package com.example.demo.member.oauth2;
 
+import com.example.demo.member.domain.Member;
 import lombok.Builder;
 import lombok.Getter;
-import teamproject.oauthlogin.domain.Member;
 
 import java.util.Map;
 
@@ -58,15 +58,4 @@ public class OAuthAttributes {
                 .build();
     }
 
-    public Member toEntity(String provider_name) {
-
-
-        return Member.builder()
-                .name(name)
-                .email(email)
-                .provider(provider_name)
-                .build();
-
-
-    }
 }

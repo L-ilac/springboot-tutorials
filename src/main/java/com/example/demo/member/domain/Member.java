@@ -47,4 +47,5 @@ public class Member {
     @Column
     private String providerId;
 
+
 }

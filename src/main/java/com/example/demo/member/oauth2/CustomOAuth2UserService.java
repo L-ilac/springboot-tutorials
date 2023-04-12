@@ -14,8 +14,6 @@ import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
-import teamproject.oauthlogin.domain.Member;
-import teamproject.oauthlogin.repository.MemberRepository;
 import java.util.Map;
 
 
